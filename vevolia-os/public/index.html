@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Vevolia OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one cream page, a black tab rail on the left (a tab bar on phones), one simple page at a time. Pastel cards for the numbers that matter. */
+:root{
+  color-scheme:light;
+  --bg:#f7f1e3; --card:#ece5d5; --card2:#e3dbc8; --white:#fffdf8; --ink:#141414; --muted:#6e675a; --line:#dcd2bd;
+  --pink:#f5b8d8; --pink2:#e57cb4; --yellow:#f6d86b; --blue:#b4c8ef; --olive:#a3b06b; --green:#a9c97a; --red:#c2413b;
+  --font:"Instrument Sans","Helvetica Neue",Arial,system-ui,sans-serif;
+}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
+*{box-sizing:border-box}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2.5px solid var(--pink2);outline-offset:2px}
+.app{display:grid;grid-template-columns:210px minmax(0,1fr);min-height:100vh}
+/* tab rail */
+.rail{background:var(--ink);color:#f2eee6;padding:24px 12px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh}
+.logo{font-weight:700;font-size:24px;letter-spacing:-.02em;padding:0 12px;display:flex;align-items:center;gap:8px}
+.logo i{width:10px;height:10px;border-radius:50%;background:var(--pink)}
+.tabs{display:flex;flex-direction:column;gap:4px}
+.tab{all:unset;cursor:pointer;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;font-size:15px;font-weight:500;color:#d8d3c8}
+.tab svg{width:20px;height:20px;flex:none}
+.tab:hover{background:#262626;color:#fff}
+.tab[aria-current="page"]{background:var(--pink);color:var(--ink);font-weight:700}
+.tab:focus-visible{outline:2.5px solid var(--pink)}
+.tab .n{margin-left:auto;font-size:12px;opacity:.7;font-variant-numeric:tabular-nums}
+.railfoot{margin-top:auto;padding:0 12px;font-size:12px;color:#9b958a}
+.railfoot a{color:#f2eee6}
+/* page */
+.main{min-width:0;padding-block:32px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.page{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
+@media (min-width:861px){.main{padding-left:40px;padding-right:max(40px,env(safe-area-inset-right,0px))}}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+h1{font-size:34px;font-weight:600;letter-spacing:-.025em;margin:0;line-height:1.1;text-wrap:balance}
+h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0}
+.sub{color:var(--muted);margin:6px 0 0;max-width:60ch}
+.muted{color:var(--muted)} .small{font-size:13px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.section{display:flex;flex-direction:column;gap:12px}
+/* buttons */
+.btn{border:0;border-radius:999px;padding:10px 20px;font-weight:600;cursor:pointer;background:var(--ink);color:#fff;display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-size:14px;white-space:nowrap}
+.btn:hover{background:#333}
+.btn.light{background:var(--card);color:var(--ink)}
+.btn.light:hover{background:var(--card2)}
+.btn.small{padding:6px 14px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link{border:0;background:none;padding:4px 0;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:14px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:0;border-radius:999px;background:var(--card);padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.chip:hover{background:var(--card2)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--white);white-space:nowrap}
+.tag.pink{background:var(--pink)} .tag.yellow{background:var(--yellow)} .tag.blue{background:var(--blue)} .tag.olive{background:var(--olive)} .tag.green{background:var(--green)} .tag.red{background:var(--red);color:#fff} .tag.dark{background:var(--ink);color:#fff}
+/* big number cards */
+.cards{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.cards.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{border-radius:24px;padding:20px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:6px;min-width:0;min-height:150px}
+.card>*{position:relative;z-index:1}
+.card .shape{position:absolute;z-index:0;pointer-events:none}
+.card.pink{background:var(--pink)} .card.yellow{background:var(--yellow)} .card.blue{background:var(--blue)} .card.olive{background:var(--olive)} .card.plain{background:var(--card)}
+.card .label{font-size:14px;font-weight:600}
+.card .big{font-size:32px;font-weight:600;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.card .note{font-size:13px;margin-top:auto}
+.bar{height:8px;border-radius:999px;background:rgba(255,255,255,.55);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:999px;min-width:4px}
+/* lists */
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:18px;padding:10px 14px}
+.item.late{background:#f6dfe8}
+.check{width:30px;height:30px;border-radius:50%;border:2px solid var(--ink);background:var(--white);cursor:pointer;display:grid;place-items:center;flex:none;padding:0}
+.check:hover{background:var(--green)}
+.check svg{width:16px;height:16px;opacity:0}
+.check:hover svg,.check.on svg{opacity:1}
+.check.on{background:var(--ink);color:#fff}
+.item .open{all:unset;cursor:pointer;min-width:0;display:flex;flex-direction:column}
+.item .open:focus-visible{outline:2.5px solid var(--pink2);border-radius:6px}
+.item .t{font-weight:600;line-height:1.3}
+.item .s{font-size:13px;color:var(--muted)}
+.item.done .t{text-decoration:line-through;color:var(--muted)}
+.empty{border:2px dashed var(--line);border-radius:20px;padding:24px;text-align:center;color:var(--muted)}
+.two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px;align-items:start}
+.box{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:16px 18px}
+.callout{border-radius:18px;padding:14px 18px;background:var(--yellow);font-size:14px}
+.callout.blue{background:var(--blue)} .callout.pink{background:var(--pink)} .callout.green{background:var(--green)}
+/* board */
+.board{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}
+.col{background:var(--card);border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.col .item{background:var(--white)}
+.col h2{font-size:16px;padding:4px 6px;display:flex;justify-content:space-between}
+/* tables */
+.tw{overflow-x:auto;background:var(--white);border:1px solid var(--line);border-radius:20px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover td{background:#faf6ec}
+/* plan inputs */
+.inputs{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))}
+.inp{background:var(--card);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.inp label{font-size:13px;font-weight:600}
+.inp .help{font-size:12px;color:var(--muted)}
+.inp input{border:0;background:var(--white);border-radius:12px;padding:9px 12px;font-weight:600;font-size:16px;width:100%;font-variant-numeric:tabular-nums}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px 16px;margin:0}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+/* testing */
+.rules{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.rule{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--card);border-radius:18px;padding:12px 16px}
+.dot{width:14px;height:14px;border-radius:50%}
+.dot.ok{background:#5f9a3a} .dot.bad{background:var(--pink2)}
+.steps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.step{border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:6px;text-align:left;font-size:12px;color:var(--muted);min-width:0}
+.step i{height:10px;border-radius:999px;background:var(--white);border:1px solid var(--line)}
+.step.done i{background:var(--ink);border-color:var(--ink)}
+.step.now i{background:var(--pink2);border-color:var(--pink2)}
+.step.done,.step.now{color:var(--ink);font-weight:600}
+.step:disabled{cursor:default}
+/* accordion */
+details.acc{background:var(--card);border-radius:18px}
+details.acc summary{cursor:pointer;padding:14px 18px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:10px;align-items:center}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:"+";font-size:20px;line-height:1}
+details.acc[open] summary::after{content:"–"}
+details.acc .body{padding:0 18px 16px;white-space:pre-wrap;max-width:75ch}
+/* form sheet */
+.ov{position:fixed;inset:0;background:rgba(20,16,8,.45);display:flex;align-items:flex-start;justify-content:center;padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));z-index:50;overflow:auto}
+.sheet.wide{width:min(760px,100%)}
+.flag{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)}
+.flag:last-child{border-bottom:0}
+.sheet{background:var(--bg);border-radius:26px;width:min(560px,100%);padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.fgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}
+.fgrid .wide{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+.sheet input,.sheet select,.sheet textarea,.search{width:100%;border:1px solid var(--line);background:var(--white);border-radius:12px;padding:10px 12px;font-size:15px}
+.sheet textarea{min-height:90px;resize:vertical}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;z-index:60}
+.ro .writeonly{display:none!important}
+.fade{animation:fade .2s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fade{animation:none}}
+@media (max-width:1000px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .rail{position:sticky;top:0;height:auto;z-index:20;display:block;padding:8px max(8px,env(safe-area-inset-right,0px)) 8px max(8px,env(safe-area-inset-left,0px));padding-top:max(8px,env(safe-area-inset-top,0px))}
+  .logo{display:none}
+  .tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+  .tab{flex-direction:column;gap:2px;padding:6px 2px;font-size:12px;text-align:center;justify-content:center;border-radius:10px}
+  .tab svg{width:18px;height:18px}.tab .n{display:none}
+  .railfoot{display:none}
+  .main{padding-block:22px 60px}
+  h1{font-size:28px}
+  .board,.rules,.cards.three{grid-template-columns:1fr!important}
+  .steps span{display:none}
+}
+@media (max-width:520px){.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{min-height:120px;padding:14px;border-radius:20px}.card .big{font-size:24px}.card .label,.card .note{font-size:12px}.card .shape{transform:scale(.7);transform-origin:top right}.cards.three .card:last-child:nth-child(odd){grid-column:1/-1}}
+</style>
+</head>
+<body>
+<script src="/shim.js"></script>
+
+
+<div class="app" id="app">
+  <aside class="rail">
+    <div class="logo">vevolia<i></i></div>
+    <nav class="tabs" id="tabs" aria-label="Pages"></nav>
+    <div class="railfoot"><a href="https://claude.ai/artifact/H3YdcfpjJ2p8vS415pgfAw" target="_blank" rel="noopener">Live store numbers ↗</a><br><a href="#" onclick="vosLogout();return false">Log out</a></div>
+  </aside>
+  <main class="main"><div class="page" id="view"><div class="empty">Loading…</div></div></main>
+</div>
+
+<script>
+(() => {
+/* ---------- icons ---------- */
+const P = {
+  home: '<path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  ads: '<path d="M4 10v4a1 1 0 0 0 1 1h2l6 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M17 9a4 4 0 0 1 0 6"/>',
+  money: '<circle cx="12" cy="12" r="8.5"/><path d="M14.5 9.3c-.5-.8-1.4-1.3-2.5-1.3-1.5 0-2.5.8-2.5 2s1 1.6 2.5 2 2.5.9 2.5 2-1 2-2.5 2c-1.1 0-2-.5-2.5-1.3M12 6.5v11"/>',
+  test: '<path d="M9 3h6M10 3v6l-5.5 9.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7.5 15h9"/>',
+  book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5"/>',
+  doc: '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+  note: '<path d="M7 3.5h10a1 1 0 0 1 1 1V21l-6-4-6 4V4.5a1 1 0 0 1 1-1z"/>',
+  spark: '<path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/>',
+};
+const icon = (n) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+
+/* ---------- tabs ---------- */
+const TABS = [['home', 'Home', 'home'], ['tasks', 'Tasks', 'check'], ['ads', 'Ads', 'ads'], ['creative', 'Creative', 'spark'], ['money', 'Money', 'money'], ['testing', 'Testing', 'test'], ['rules', 'Rules', 'book'], ['docs', 'Docs', 'doc'], ['notes', 'Notes', 'note']];
+const NUMBERS_URL = 'https://claude.ai/artifact/H3YdcfpjJ2p8vS415pgfAw';
+const S = { tab: 'home', db: null, canWrite: true, loaded: false, data: { scorecard: [], ads: [], tasks: [], sops: [], docs: [], memory: [], intel: [], spins: [], research: [], scripts: [] }, plan: null, os: null,
+  f: { tasks: 'All', ads: 'All', notes: 'All', docs: '', cview: 'Research', csrc: 'All' }, lastTab: null, mcp: null, meta: { state: 'idle' }, shop: { state: 'idle' } };
+try { const t = localStorage.getItem('vos-tab2'); if (t && TABS.some(x => x[0] === t)) S.tab = t; } catch (e) {}
+const hash = location.hash.slice(1); if (TABS.some(x => x[0] === hash)) S.tab = hash;
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v; else if (k === 'html') n.innerHTML = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else if (k === 'text') n.textContent = v; else n.setAttribute(k, v === true ? '' : v);
+  }
+  for (const k of kids.flat()) if (k != null && k !== false) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return n;
+};
+const money = (v, d = 0) => v == null || !isFinite(v) ? '—' : (v < 0 ? '−' : '') + '$' + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+const num = (v, d = 0) => v == null || !isFinite(v) ? '—' : Number(v).toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+const pct = (v, d = 0) => v == null || !isFinite(v) ? '—' : (v * 100).toFixed(d) + '%';
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const today = () => iso(new Date());
+const parse = (s) => new Date(s + 'T00:00:00');
+const addDays = (s, n) => { const x = parse(s); x.setDate(x.getDate() + n); return iso(x); };
+const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+const nice = (s) => { if (!s) return ''; const t = today(); if (s === t) return 'Today'; if (s === addDays(t, 1)) return 'Tomorrow'; if (s === addDays(t, -1)) return 'Yesterday'; return parse(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
+const mondayOf = (s) => { const x = parse(s); x.setDate(x.getDate() - (x.getDay() + 6) % 7); return iso(x); };
+const toast = (m) => { document.querySelectorAll('.toast').forEach(t => t.remove()); const t = el('div', { class: 'toast', role: 'status', text: m }); document.body.append(t); setTimeout(() => t.remove(), 1800); };
+const SHAPES = {
+  heart: '<svg class="shape" style="right:-8px;top:-8px;width:100px" viewBox="0 0 100 100"><path d="M50 88S8 62 8 34a21 21 0 0 1 42-6 21 21 0 0 1 42 6c0 28-42 54-42 54z" fill="#e57cb4" opacity=".45"/></svg>',
+  cross: '<svg class="shape" style="right:-14px;top:-12px;width:100px" viewBox="0 0 100 100"><path d="M38 0h24v38h38v24H62v38H38V62H0V38h38z" fill="#e9c13d" opacity=".6" transform="rotate(14 50 50)"/></svg>',
+  star: '<svg class="shape" style="right:-18px;bottom:-24px;width:110px" viewBox="0 0 100 100"><path d="M50 0l10 30 30-12-14 28 24 18-30 6 4 30-24-18-24 18 4-30-30-6 24-18L10 18l30 12z" fill="#7d99d6" opacity=".6"/></svg>',
+  tri: '<svg class="shape" style="right:8px;bottom:-30px;width:120px" viewBox="0 0 100 100"><path d="M0 8h100L48 98z" fill="#7f8c46" opacity=".5"/></svg>',
+};
+const card = (color, shape, label, big, note, extra) => { const c = el('div', { class: 'card ' + color }); if (shape) c.insertAdjacentHTML('afterbegin', SHAPES[shape]); c.append(el('div', { class: 'label' }, label), el('div', { class: 'big' }, big)); if (extra) c.append(extra); if (note) c.append(el('div', { class: 'note' }, note)); return c; };
+const head = (title, sub, ...actions) => el('div', { class: 'head' }, el('div', {}, el('h1', {}, title), sub ? el('p', { class: 'sub' }, sub) : null), actions.length ? el('div', { class: 'row' }, ...actions) : null);
+const OPEN = new Set();
+const acc = (key, summary, ...body) => { const d = el('details', { class: 'acc', 'data-key': key, open: OPEN.has(key) || null }, el('summary', {}, summary), ...body); d.addEventListener('toggle', () => { d.open ? OPEN.add(key) : OPEN.delete(key); }); return d; };
+const addBtn = (label, onclick) => el('button', { class: 'btn writeonly', type: 'button', onclick }, '+ ' + label);
+
+/* ---------- forms ---------- */
+const OWNERS = ['Kayy', 'Saamir', 'Editor', 'Both'];
+const SCHEMA = {
+  tasks: { label: 'task', fields: [['title', 'What needs to happen?', 'text', { wide: true, required: true }], ['owner', 'Who does it?', 'select', { options: OWNERS }], ['due', 'Due date', 'date'], ['status', 'Status', 'select', { options: ['To do', 'Doing', 'Done'] }], ['priority', 'How important?', 'select', { options: ['Normal', 'High', 'Low'] }], ['area', 'Area', 'select', { options: ['Store', 'Ads', 'Creative', 'Offer', 'Ops', 'Legal', 'Finance'] }], ['notes', 'Notes', 'textarea', { wide: true }]] },
+  ads: { label: 'ad batch', fields: [['batch', 'Batch number', 'text', { required: true }], ['status', 'Status', 'select', { options: ['Idea', 'Draft', 'Greenlight', 'Filming', 'Learning', 'Done'] }], ['concept', 'Ad idea (name)', 'text', { wide: true, required: true }], ['format', 'Type of ad', 'select', { options: ['Native', 'Static', 'Video'] }], ['angle', 'Angle', 'text'], ['awareness', 'How aware is the buyer?', 'select', { options: ['Unaware', 'Problem Aware', 'Solution Aware', 'Product Aware', 'Most Aware'] }], ['launch', 'Launch date', 'date'], ['spend', 'Money spent ($)', 'number'], ['ctr', 'Click rate (%)', 'number'], ['purchases', 'Sales from this ad', 'number'], ['cpa', 'Cost per buyer ($)', 'number'], ['result', 'Result', 'select', { options: ['', 'Breakthrough', 'Spend Winner', 'KPI Winner', 'Loser'] }], ['memo', 'Story idea', 'textarea', { wide: true }], ['learnings', 'What we learned', 'textarea', { wide: true }]] },
+  scorecard: { label: 'week', fields: [['week', 'Week starting (Monday)', 'date', { required: true }], ['revenue', 'Money in ($)', 'number'], ['orders', 'Orders', 'number'], ['spend', 'Ad spend ($)', 'number'], ['sessions', 'Store visits', 'number'], ['subs', 'Subscribers', 'number'], ['notes', 'What happened this week?', 'textarea', { wide: true }]] },
+  docs: { label: 'doc', fields: [['title', 'Name', 'text', { wide: true, required: true }], ['url', 'Link', 'url', { wide: true }], ['group', 'Group', 'select', { options: ['Vevolia', 'Saamir SOPs', 'Avant OPS', 'Research', 'Store', 'Creative'] }], ['owner', 'Owner', 'text'], ['purpose', 'What is it for?', 'textarea', { wide: true }]] },
+  memory: { label: 'note', fields: [['kind', 'Type', 'select', { options: ['Decision', 'Learning', 'Rule', 'Fact', 'Idea'] }], ['date', 'Date', 'date'], ['text', 'Note', 'textarea', { wide: true, required: true }], ['tags', 'Tags', 'text', { wide: true }]] },
+  sops: { label: 'rule', fields: [['title', 'Title', 'text', { wide: true, required: true }], ['group', 'Group', 'select', { options: ['Operating rhythm', 'Testing', 'Creative', 'Media buying', 'Store', 'Infrastructure'] }], ['order', 'Order', 'number'], ['source', 'Source link', 'url', { wide: true }], ['body', 'Steps', 'textarea', { wide: true }]] },
+  spins: { label: 'test', fields: [['name', 'Product being tested', 'text', { wide: true, required: true }], ['status', 'Status', 'select', { options: ['Planned', 'Testing', 'Live', 'Scaling', 'Killed'] }], ['handoff', 'Handed to us on', 'date'], ['live', 'Went live on', 'date'], ['blocker', 'What is stuck? (leave empty if nothing)', 'text', { wide: true }], ['blockedSince', 'Stuck since', 'date'], ['progress', 'Update for today', 'textarea', { wide: true }], ['learnings', 'What we learned', 'textarea', { wide: true }], ['verdict', 'Decision', 'select', { options: ['', 'Kill', 'Iterate', 'Continue', 'Scale'] }]] },
+  research: { label: 'research find', fields: [['title', 'What did you find?', 'text', { wide: true, required: true }], ['source', 'Where?', 'select', { options: ['Atria', 'TrendTrack', 'Reddit', 'Google', 'Meta Ad Library', 'TikTok', 'Other'] }], ['brand', 'Brand or person', 'text'], ['format', 'Type', 'select', { options: ['Native', 'Static', 'Video', 'Landing page', 'Customer words'] }], ['hook', 'The hook or quote', 'textarea', { wide: true }], ['angle', 'Angle', 'text'], ['status', 'Status', 'select', { options: ['New', 'Use it', 'Made', 'Skip'] }], ['why', 'Why it works', 'textarea', { wide: true }], ['link', 'Link', 'url', { wide: true }], ['found', 'Found on', 'date']] },
+  scripts: { label: 'script', fields: [['title', 'Script name', 'text', { wide: true, required: true }], ['type', 'Type', 'select', { options: ['UGC creator video', 'Pixar-style singing video', 'Expert explainer (VSL)', 'Native story', 'Static image', 'Other video'] }], ['status', 'Status', 'select', { options: ['Writing', 'Ready for editors', 'Editing', 'Done', 'Launched'] }], ['editor', 'Editor', 'text'], ['due', 'Due', 'date'], ['hook', 'Hook (first 3 seconds)', 'text', { wide: true }], ['script', 'Script', 'textarea', { wide: true, tall: true }], ['notes', 'Notes for the editor', 'textarea', { wide: true }]] },
+  goals: { label: 'weekly goals', docPath: 'meta/os', fields: [['goalNative', 'Native ads per week', 'number'], ['goalStatic', 'Static ads per week', 'number'], ['goalVideo', 'Video ads per week', 'number']] },
+  intel: { label: 'competitor', fields: [['brand', 'Brand', 'text', { required: true }], ['product', 'Product', 'text'], ['signal', 'How big are they?', 'textarea', { wide: true }], ['working', 'What is working for them?', 'textarea', { wide: true }], ['checked', 'Checked on', 'date']] },
+};
+function editor(coll, rec) {
+  if (!S.canWrite || !S.db) return;
+  const sc = SCHEMA[coll]; const isNew = !rec || !rec.id; const vals = { ...(rec || {}) };
+  const ov = el('div', { class: 'ov', role: 'dialog', 'aria-modal': 'true', 'aria-label': (isNew ? 'Add ' : 'Edit ') + sc.label });
+  const form = el('div', { class: 'fgrid' }); const inputs = {};
+  for (const [k, lab, type, o = {}] of sc.fields) {
+    const id = 'f-' + k; let inp;
+    if (type === 'select') { inp = el('select', { id }); const opts = vals[k] && !o.options.includes(vals[k]) ? [...o.options, vals[k]] : o.options; opts.forEach(op => inp.append(el('option', { value: op, text: op || '—' }))); inp.value = vals[k] ?? o.options[0]; }
+    else if (type === 'textarea') { inp = el('textarea', { id, style: o.tall ? 'min-height:260px' : null }); inp.value = vals[k] ?? ''; }
+    else { inp = el('input', { id, type, step: type === 'number' ? 'any' : null }); inp.value = vals[k] ?? ''; }
+    inputs[k] = [inp, type, o]; form.append(el('label', { class: 'f' + (o.wide ? ' wide' : ''), for: id }, lab, inp));
+  }
+  const close = () => { ov.remove(); document.removeEventListener('keydown', esc); };
+  const esc = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', esc);
+  let armed = false;
+  const del = isNew ? el('span') : el('button', { class: 'btn light small', type: 'button', onclick: async () => {
+    if (!armed) { armed = true; del.textContent = 'Tap again to delete'; return; }
+    try { await S.db.collection(coll).doc(rec.id).delete(); toast('Deleted'); close(); } catch (e) { fail(e); } } }, 'Delete');
+  const save = el('button', { class: 'btn', type: 'button', onclick: async () => {
+    const out = {};
+    for (const [k, [inp, type, o]] of Object.entries(inputs)) {
+      const v = inp.value.trim();
+      if (o.required && !v) { inp.focus(); toast('Please fill in “' + inp.closest('label').firstChild.textContent + '”'); return; }
+      out[k] = type === 'number' ? (v === '' ? null : Number(v)) : v;
+    }
+    out.updatedAt = new Date().toISOString(); if (isNew) out.createdAt = out.updatedAt; save.disabled = true;
+    try { if (sc.docPath) { delete out.createdAt; await S.db.doc(sc.docPath).update(out); toast('Saved'); close(); return; } const { id, ...keep } = { ...vals, ...out }; await (isNew ? S.db.collection(coll).doc() : S.db.collection(coll).doc(rec.id)).set(keep); toast(isNew ? 'Added' : 'Saved'); close(); } catch (e) { save.disabled = false; fail(e); } } }, sc.docPath ? 'Save' : isNew ? 'Add' : 'Save');
+  if (sc.docPath) del.replaceWith(el('span'));
+  const extra = coll === 'scripts' ? scriptHelper(inputs) : null;
+  ov.append(el('div', { class: 'sheet' + (coll === 'scripts' ? ' wide' : '') }, el('h2', {}, sc.docPath ? 'Change ' + sc.label : (isNew ? 'Add a ' : 'Edit ') + sc.label), form, extra, el('div', { class: 'between' }, sc.docPath ? el('span') : del, el('div', { class: 'row' }, el('button', { class: 'btn light', type: 'button', onclick: close }, 'Cancel'), save))));
+  ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+  document.body.append(ov); const first = form.querySelector('input,select,textarea'); if (first) first.focus();
+}
+function fail(e) {
+  if (e && e.code === 'invalid_argument') { S.canWrite = false; $('#app').classList.add('ro'); toast('You can look, but you can’t make changes'); }
+  else if (e && e.code === 'quota_exceeded') toast('Storage is full. Delete old items first.');
+  else toast('That didn’t save. Please try again.');
+}
+async function setTask(t, fields, msg) { try { await S.db.collection('tasks').doc(t.id).update({ ...fields, updatedAt: new Date().toISOString() }); if (msg) toast(msg); } catch (e) { fail(e); } }
+
+/* ---------- numbers ---------- */
+const PLAN_DEFAULTS = { target: 1000000, months: 12, aov: 55, cogs: 14, ship: 5, feesPct: 4, cpa: 55, rebillPct: 60, rebillMonths: 3 };
+function plan() {
+  const q = { ...PLAN_DEFAULTS, ...(S.plan || {}) };
+  const perMonth = q.target / q.months;
+  const keepPerOrder = q.aov - q.cogs - q.ship - q.aov * q.feesPct / 100;
+  let ordersPerBuyer = 0; for (let k = 0; k <= q.rebillMonths; k++) ordersPerBuyer += Math.pow(q.rebillPct / 100, k);
+  const buyerWorth = keepPerOrder * ordersPerBuyer;
+  const newBuyers = perMonth / (q.aov * ordersPerBuyer);
+  const orders = newBuyers * ordersPerBuyer;
+  const adBudget = newBuyers * q.cpa;
+  const costs = orders * (q.cogs + q.ship + q.aov * q.feesPct / 100);
+  const profit = perMonth - costs - adBudget;
+  return { q, perMonth, perDay: perMonth / 30.4, keepPerOrder, ordersPerBuyer, buyerWorth, newBuyers, orders, ordersDay: orders / 30.4, adBudget, adDay: adBudget / 30.4, profit };
+}
+function totals() {
+  const rows = [...S.data.scorecard].sort((a, b) => (a.week || '').localeCompare(b.week || ''));
+  const sum = (k) => rows.reduce((s, r) => s + (r[k] || 0), 0);
+  const months = {}; rows.forEach(r => { const k = (r.week || '').slice(0, 7); months[k] = (months[k] || 0) + (r.revenue || 0); });
+  return { rows, revenue: sum('revenue'), orders: sum('orders'), spend: sum('spend'), bestWeek: Math.max(0, ...rows.map(r => r.revenue || 0)), bestMonth: Math.max(0, ...Object.values(months)) };
+}
+const GOALS = [['Get the first real order', t => t.orders >= 1], ['Make $1,000 in one week', t => t.bestWeek >= 1000], ['Make $10,000 in one month', t => t.bestMonth >= 10000], ['Make $25,000 in one month', t => t.bestMonth >= 25000], ['Make $83,000 in one month ($1M a year pace)', t => t.bestMonth >= 83333], ['Reach $1,000,000 total', t => t.revenue >= 1e6]];
+const openTasks = () => S.data.tasks.filter(t => t.status !== 'Done');
+const isLate = (t) => t.status !== 'Done' && t.due && t.due < today();
+const byDue = (a, b) => (isLate(b) - isLate(a)) || (a.due || '9999').localeCompare(b.due || '9999') || ((a.priority === 'High' ? 0 : 1) - (b.priority === 'High' ? 0 : 1));
+function testPace() {
+  const t0 = today(), spins = S.data.spins;
+  const started = spins.filter(s => (s.handoff || '').slice(0, 7) === t0.slice(0, 7)).length;
+  const active = spins.filter(s => ['Testing', 'Live', 'Scaling'].includes(s.status)).sort((a, b) => (b.handoff || '').localeCompare(a.handoff || ''));
+  const cur = active[0];
+  const daysToLive = cur && cur.handoff ? daysBetween(cur.handoff, cur.live || t0) : null;
+  const batchesPerDay = S.data.ads.filter(a => a.launch && a.launch >= addDays(t0, -6) && a.launch <= t0).length / 7;
+  const stuck = spins.filter(s => s.blocker && s.blockedSince && daysBetween(s.blockedSince, t0) >= 1 && s.status !== 'Killed');
+  return { started, cur, daysToLive, batchesPerDay, stuck };
+}
+
+/* ---------- task row ---------- */
+function taskRow(t) {
+  const late = isLate(t), done = t.status === 'Done';
+  const who = [t.owner, t.due ? (late ? 'Late — was due ' + nice(t.due) : 'Due ' + nice(t.due)) : 'No due date'].filter(Boolean).join(' · ');
+  return el('div', { class: 'item' + (late ? ' late' : '') + (done ? ' done' : '') },
+    el('button', { class: 'check writeonly' + (done ? ' on' : ''), type: 'button', 'aria-label': done ? 'Mark not done: ' + t.title : 'Mark done: ' + t.title, html: icon('check'), onclick: () => setTask(t, { status: done ? 'To do' : 'Done' }, done ? 'Moved back to To do' : 'Nice! Marked done') }),
+    el('button', { class: 'open', type: 'button', onclick: () => editor('tasks', t) }, el('span', { class: 't' }, t.title), el('span', { class: 's' }, who)),
+    t.priority === 'High' && !done ? el('span', { class: 'tag yellow' }, 'Important') : t.status === 'Doing' ? el('span', { class: 'tag blue' }, 'Doing') : el('span'));
+}
+
+/* ---------- pages ---------- */
+function adsCallout() {
+  if (S.meta.state !== 'ok') return null;
+  const act = S.meta.rows.map(a => ({ ...a, adv: advise(a) })).filter(r => !r.adv.off);
+  const stop = act.filter(r => r.adv.kind === 'stop').length, grow = act.filter(r => r.adv.kind === 'grow').length;
+  if (!stop && !grow) return el('div', { class: 'callout blue' }, el('b', {}, 'Ads: '), 'No ad needs action right now. ', el('button', { class: 'link', type: 'button', onclick: () => go('ads') }, 'See ads'));
+  return el('div', { class: 'callout ' + (stop ? 'pink' : 'green') }, el('b', {}, 'Ads: '), [stop ? stop + ' ad' + (stop === 1 ? '' : 's') + ' should be stopped' : '', grow ? grow + ' ready to grow' : ''].filter(Boolean).join(', ') + '. ', el('button', { class: 'link', type: 'button', onclick: () => go('ads') }, 'See what to do'));
+}
+function greeting() { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
+function pageHome() {
+  const t = totals(), p = plan(), tp = testPace(), t0 = today();
+  const open = openTasks(), late = open.filter(isLate);
+  const nextGoal = (GOALS.find(([, f]) => !f(t)) || ['All goals reached'])[0];
+  const progress = Math.min(1, t.revenue / p.q.target);
+  const todo = [...open].sort(byDue).slice(0, 6);
+  const soon = [];
+  for (let i = 0; i <= 7; i++) { const d = addDays(t0, i);
+    S.data.ads.filter(a => a.launch && addDays(a.launch, 7) === d).forEach(a => soon.push([d, 'Check results for ad batch ' + a.batch, 'blue']));
+    S.data.ads.filter(a => a.launch === d).forEach(a => soon.push([d, 'Ad batch ' + a.batch + ' goes live', 'pink'])); }
+  open.filter(x => x.due && x.due > t0 && x.due <= addDays(t0, 7) && !todo.includes(x)).forEach(x => soon.push([x.due, x.title, '']));
+  soon.sort((a, b) => a[0].localeCompare(b[0]));
+  const lede = late.length ? `You have ${late.length} late task${late.length === 1 ? '' : 's'}. Start there.` : open.length ? `You have ${open.length} open tasks. Nothing is late.` : 'All tasks are done. Great work.';
+  return [
+    head(greeting() + ', Kayy', lede + ' ' + ((S.os && S.os.focus) || '')),
+    el('div', { class: 'cards' },
+      card('pink', 'heart', 'Money made so far', money(t.revenue), 'Next goal: ' + nextGoal, el('div', { class: 'bar', role: 'img', 'aria-label': pct(progress, 2) + ' of $1M' }, el('i', { style: `width:${progress * 100}%` }))),
+      card('yellow', 'cross', 'Spent on ads', money(t.spend), t.orders ? 'Cost per buyer: ' + money(t.spend / t.orders, 2) : 'No real orders yet'),
+      card('blue', 'star', 'Tasks left', String(open.length), late.length ? late.length + ' late' : 'None late'),
+      card('olive', 'tri', 'Daily goal', money(p.perDay), num(p.ordersDay, 0) + ' orders a day to reach $1M in ' + p.q.months + ' months')),
+    el('div', { class: 'two' },
+      el('section', { class: 'section' }, el('div', { class: 'between' }, el('h2', {}, 'Do these next'), el('button', { class: 'link', type: 'button', onclick: () => go('tasks') }, 'See all tasks')),
+        todo.length ? el('div', { class: 'list' }, todo.map(taskRow)) : el('div', { class: 'empty' }, 'Nothing to do. Add a task on the Tasks page.')),
+      el('section', { class: 'section' }, el('h2', {}, 'Coming up this week'),
+        soon.length ? el('div', { class: 'box' }, el('dl', { class: 'kv' }, soon.slice(0, 8).flatMap(([d, txt, c]) => [el('dt', { style: 'color:var(--ink)' }, txt), el('dd', {}, el('span', { class: 'tag ' + c }, nice(d)))]))) : el('div', { class: 'empty' }, 'Nothing scheduled this week.'),
+        adsCallout(),
+        tp.cur ? el('div', { class: 'callout ' + (tp.stuck.length ? 'pink' : 'blue') }, el('b', {}, 'Testing: '), tp.stuck.length ? 'Something has been stuck for over a day: “' + tp.stuck[0].blocker + '”. Tell Saamir today.' : (tp.cur.name + ' is on step ' + (tp.cur.stage || 1) + ' of 7.'), ' ', el('button', { class: 'link', type: 'button', onclick: () => go('testing') }, 'Open Testing')) : null))];
+}
+
+function pageTasks() {
+  const f = S.f.tasks;
+  const filters = ['All', 'Mine', 'Saamir', 'Late'];
+  const pick = (t) => f === 'All' || (f === 'Mine' && (t.owner === 'Kayy' || t.owner === 'Both')) || (f === 'Saamir' && (t.owner === 'Saamir' || t.owner === 'Both')) || (f === 'Late' && isLate(t));
+  const list = S.data.tasks.filter(pick);
+  const col = (name, color) => { const items = list.filter(t => (t.status || 'To do') === name).sort(byDue); return el('section', { class: 'col' }, el('h2', {}, el('span', {}, name), el('span', { class: 'tag ' + color }, String(items.length))), items.length ? items.map(taskRow) : el('div', { class: 'small muted', style: 'padding:8px' }, 'Nothing here.')); };
+  return [
+    head('Tasks', 'Tap the circle when a task is done. Tap the words to change it.', addBtn('Add task', () => editor('tasks', { status: 'To do', owner: 'Kayy', priority: 'Normal', area: 'Store' }))),
+    el('div', { class: 'chips', role: 'group', 'aria-label': 'Show tasks' }, filters.map(x => el('button', { class: 'chip', type: 'button', 'aria-pressed': String(f === x), onclick: () => { S.f.tasks = x; render(); } }, x === 'Mine' ? 'Mine (Kayy)' : x))),
+    el('div', { class: 'board' }, col('To do', 'yellow'), col('Doing', 'blue'), col('Done', 'green'))];
+}
+
+/* ---------- ad coach: stop / keep / grow ---------- */
+const META_SERVER = 'Facebook Meta Ads', META_TOOL = 'ads_get_ad_entities', SHOP_SERVER = 'Shopify', SHOP_TOOL = 'run-analytics-query';
+const metaInput = () => ({ ad_account_id: (S.os && S.os.metaAccount) || '925419377068716', level: 'ad', date_preset: 'maximum', fields: ['id', 'name', 'effective_status', 'amount_spent', 'impressions', 'clicks', 'ctr', 'cpc', 'purchases'], include_additional_context: false, advertiser_job: 'assess_and_optimize_performance', advertiser_request: 'let me know when to terminate an ad or keep it going or to put more money into it to grow' });
+const adsStart = () => (S.os && S.os.adsStart) || '2026-10-17';
+const shopInput = () => ({ query: 'FROM sales SHOW orders SINCE ' + adsStart() + ' UNTIL today' });
+const toNum = (x) => { if (x == null) return 0; if (typeof x === 'object') x = x.value; const n = Number(String(x).replace('%', '')); return isFinite(n) ? n : 0; };
+function parseMeta(payload) {
+  let a = payload; if (typeof a === 'string') a = JSON.parse(a);
+  let rows = a && a.ad_entities; if (typeof rows === 'string') rows = JSON.parse(rows);
+  if (!Array.isArray(rows)) throw { code: 'tool_error', message: 'Meta sent an answer we could not read.' };
+  return rows.map(r => { const impressions = toNum(r.impressions), clicks = toNum(r.clicks); return { id: r.id, name: r.name || 'Unnamed ad', status: r.effective_status || '', spend: toNum(r.amount_spent), impressions, clicks, ctr: r.ctr != null ? toNum(r.ctr) : (impressions ? clicks / impressions * 100 : 0), sales: toNum(r.omni_purchase ?? r.purchases) }; });
+}
+function parseShop(payload) { let a = payload; if (typeof a === 'string') a = JSON.parse(a); const rows = a && a.rows; if (!Array.isArray(rows)) throw { code: 'tool_error', message: 'Shopify sent an answer we could not read.' }; return rows.reduce((s, r) => s + toNum(Array.isArray(r) ? r[0] : r.orders), 0); }
+function advise(ad) {
+  const p = plan(), T = p.q.cpa, worth = p.buyerWorth, off = ad.status && ad.status !== 'ACTIVE';
+  const v = (kind, label, why) => ({ kind, label, why, off });
+  if (ad.spend <= 0) return v('wait', 'Not spending', 'This ad has not spent money yet. Check it is turned on and approved.');
+  if (ad.sales === 0) {
+    if (ad.spend >= 2 * T) return v('stop', 'Stop it', `It spent ${money(ad.spend, 2)} (more than 2 × ${money(T)}) and got no sales. Turn it off and try a new hook.`);
+    if (ad.spend >= 20 && ad.ctr < 1) return v('stop', 'Stop it', `Only ${num(ad.ctr, 1)}% of people click. The hook is not strong enough. Make a bolder one.`);
+    if (ad.spend >= T) return v('watch', 'Keep, but watch', `No sale yet after ${money(ad.spend, 2)}. Give it until ${money(2 * T)}. If still no sale, stop it.`);
+    return v('keep', 'Keep it', `Too early to judge. It has spent ${money(ad.spend, 2)}. Let it reach ${money(T)} before deciding.`);
+  }
+  const cpa = ad.spend / ad.sales;
+  if (cpa <= T && ad.sales >= 3) return v('grow', 'Grow it', `Each buyer costs ${money(cpa, 2)}, under our ${money(T)} goal, with ${ad.sales} sales. Raise the budget 20% every 2 days while it stays under ${money(T)}.`);
+  if (cpa <= T) return v('keep', 'Keep it', `Good start: ${money(cpa, 2)} per buyer. Wait for 3 sales before adding money.`);
+  if (cpa <= worth) return v('keep', 'Keep it', `Each buyer costs ${money(cpa, 2)}. That is above our ${money(T)} goal but still worth it over time (${money(worth, 2)}). Don't add money yet. Test new hooks.`);
+  if (ad.spend >= 2 * T) return v('stop', 'Stop it', `Each buyer costs ${money(cpa, 2)}, more than a buyer is worth to us (${money(worth, 2)}). Turn it off.`);
+  return v('watch', 'Keep, but watch', `Each buyer costs ${money(cpa, 2)}, which is too high. If it doesn't drop by ${money(2 * T)} spent, stop it.`);
+}
+const ADVICE_TAG = { stop: 'red', grow: 'green', keep: 'blue', watch: 'yellow', wait: '' };
+function metaProblem(code) {
+  if (code === 'not_set_up') return 'Live ad advice is not set up yet. Add the Meta key in Netlify (META_ACCESS_TOKEN).';
+  if (code === 'needs_reauth') return 'The Meta key expired. Make a new one and update META_ACCESS_TOKEN in Netlify.';
+  if (code === 'rate_limited') return 'Meta says slow down. Tap Refresh in a few minutes.';
+  if (code === 'server_not_connected' || code === 'selection_required') return 'Connect “Facebook Meta Ads” in claude.ai Settings → Connectors to see live advice.';
+  if (code === 'needs_reauth') return 'Your Meta connection expired. Reconnect “Facebook Meta Ads” in claude.ai Settings → Connectors.';
+  if (code === 'not_in_manifest' || code === 'not_granted' || code === 'capability_disabled' || code === 'capability_removed') return 'This page is not allowed to read Meta right now. Allow it from the page’s Permissions menu.';
+  if (code === 'blocked_by_policy' || code === 'approval_required') return 'Your organization blocks this Meta tool here.';
+  return 'Meta did not answer. Tap Refresh in a minute.';
+}
+let metaUnsub = null, shopUnsub = null;
+function startAdWatch(force) {
+  const mcp = S.mcp; if (!mcp) { S.meta = { state: 'none' }; return; }
+  if (metaUnsub) metaUnsub(); if (shopUnsub) shopUnsub();
+  if (S.meta.state !== 'ok') S.meta = { ...S.meta, state: 'loading' };
+  metaUnsub = mcp.watchTool(META_SERVER, META_TOOL, metaInput(), (ev) => {
+    if (ev.type === 'data') { try { S.meta = { state: 'ok', rows: parseMeta(ev.result.payload), at: (ev.result.cache && ev.result.cache.storedAt) || Date.now() }; } catch (e) { S.meta = { state: 'error', msg: 'Meta sent an answer we could not read.' }; } }
+    else { const c = ev.error && ev.error.code; const deny = ['needs_reauth', 'server_not_connected', 'blocked_by_policy', 'approval_required', 'not_in_manifest', 'selection_required', 'not_granted', 'capability_disabled'].includes(c); S.meta = (S.meta.state === 'ok' && !deny) ? { ...S.meta, stale: true } : { state: 'error', msg: metaProblem(c) }; }
+    later();
+  }, { cache: { staleTime: force ? 0 : 300000 } });
+  shopUnsub = mcp.watchTool(SHOP_SERVER, SHOP_TOOL, shopInput(), (ev) => {
+    if (ev.type === 'data') { try { S.shop = { state: 'ok', orders: parseShop(ev.result.payload) }; } catch (e) { S.shop = { state: 'error' }; } } else S.shop = { state: 'error' };
+    later();
+  }, { cache: { staleTime: 300000 } });
+}
+async function refreshAds() { if (!S.mcp) return; S.meta = { ...S.meta, state: S.meta.state === 'ok' ? 'ok' : 'loading', refreshing: true }; render(); try { await S.mcp.invalidate(META_SERVER); await S.mcp.invalidate(SHOP_SERVER); } catch (e) {} startAdWatch(true); toast('Getting fresh numbers…'); }
+let queued = false; function later() { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; render(); }); }
+function coachSection() {
+  const p = plan(), T = p.q.cpa, m = S.meta;
+  const rules = acc('rules-ads', 'How we decide (tap to read)', el('div', { class: 'body' },
+    `1. Too early: if an ad has spent less than ${money(T)} (what we can pay for one buyer), let it run.\n` +
+    `2. Stop it: if it spends ${money(2 * T)} (2 × ${money(T)}) with no sales, turn it off. This is Saamir's rule.\n` +
+    `3. Stop it early: if fewer than 1 in 100 people click after $20, the hook is too weak.\n` +
+    `4. Keep it: if a buyer costs ${money(T)} or less, keep it. Wait for 3 sales before adding money.\n` +
+    `5. Grow it: with 3+ sales under ${money(T)} each, raise the budget 20% every 2 days. Stop raising if the cost goes over ${money(T)}.\n` +
+    `6. A buyer is worth about ${money(p.buyerWorth, 2)} to us over time, with reorders. Never keep an ad that pays more than that per buyer.\n` +
+    `7. Change one thing at a time, and never judge an ad on its first day.\n` +
+    `These numbers come from the Money page. Change “Cost to get one buyer” there and the rules update.`));
+  if (m.state === 'none') return el('section', { class: 'section' }, el('h2', {}, 'Stop, keep, or grow?'), el('div', { class: 'callout' }, 'Live ad advice only works inside Claude. Open this page in claude.ai to see it.'), rules);
+  if (m.state !== 'ok') return el('section', { class: 'section' }, el('div', { class: 'between' }, el('h2', {}, 'Stop, keep, or grow?'), m.state === 'error' ? el('button', { class: 'btn light small', type: 'button', onclick: refreshAds }, 'Refresh') : null),
+    m.state === 'error' ? el('div', { class: 'callout pink' }, m.msg) : el('div', { class: 'empty' }, 'Getting your ad numbers from Meta…'), rules);
+  const rows = m.rows.map(a => ({ ...a, adv: advise(a) })).sort((a, b) => ['stop', 'grow', 'watch', 'keep', 'wait'].indexOf(a.adv.kind) - ['stop', 'grow', 'watch', 'keep', 'wait'].indexOf(b.adv.kind) || b.spend - a.spend);
+  const active = rows.filter(r => !r.adv.off);
+  const count = (k) => active.filter(r => r.adv.kind === k).length;
+  const metaSales = rows.reduce((s, r) => s + r.sales, 0);
+  const tracking = S.shop.state === 'ok' && S.shop.orders > metaSales;
+  const time = new Date(m.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  return el('section', { class: 'section' },
+    el('div', { class: 'between' }, el('div', {}, el('h2', {}, 'Stop, keep, or grow?'), el('div', { class: 'small muted' }, 'Live from Meta · updated ' + time + (m.stale ? ' · could not refresh' : ''))), el('button', { class: 'btn light small', type: 'button', onclick: refreshAds }, 'Refresh')),
+    el('div', { class: 'row' }, el('span', { class: 'tag red' }, 'Stop ' + count('stop')), el('span', { class: 'tag yellow' }, 'Watch ' + count('watch')), el('span', { class: 'tag blue' }, 'Keep ' + count('keep')), el('span', { class: 'tag green' }, 'Grow ' + count('grow'))),
+    tracking ? el('div', { class: 'callout pink' }, el('b', {}, 'Warning: '), `Shopify got ${S.shop.orders} order${S.shop.orders === 1 ? '' : 's'} since ads started, but Meta only sees ${metaSales}. Meta can’t see some sales, so “no sales” advice may be wrong. Fix tracking first.`) : null,
+    rows.length ? el('div', { class: 'list' }, rows.map(r => el('div', { class: 'item', style: 'align-items:start' + (r.adv.off ? ';opacity:.6' : '') },
+      el('span', { class: 'tag ' + ADVICE_TAG[r.adv.kind] }, r.adv.label),
+      el('div', {}, el('div', { class: 't' }, r.name, r.adv.off ? el('span', { class: 'small muted' }, ' · turned off') : null), el('div', { style: 'margin:2px 0' }, r.adv.why), el('div', { class: 's' }, `Spent ${money(r.spend, 2)} · ${num(r.clicks)} clicks · ${num(r.ctr, 1)}% click rate · ${num(r.sales)} sales`)),
+      el('span')))) : el('div', { class: 'empty' }, 'No ads found in the Meta account.'),
+    rules);
+}
+
+const AD_TAG = { Idea: '', Draft: '', Greenlight: 'yellow', Filming: 'yellow', Learning: 'blue', Done: 'green', Breakthrough: 'pink', 'Spend Winner': 'green', 'KPI Winner': 'green', Loser: 'dark' };
+function pageAds() {
+  const f = S.f.ads, statuses = ['All', 'Idea', 'Draft', 'Greenlight', 'Filming', 'Learning', 'Done'];
+  const ads = S.data.ads, list = ads.filter(a => f === 'All' || a.status === f).sort((a, b) => String(a.batch).localeCompare(String(b.batch), undefined, { numeric: true }));
+  const live = ads.filter(a => a.launch), wins = ads.filter(a => ['Breakthrough', 'Spend Winner', 'KPI Winner'].includes(a.result));
+  const next = Math.max(113, ...ads.map(a => parseInt(String(a.batch).replace(/\D/g, ''), 10) || 0)) + 1;
+  return [
+    head('Ads', 'Every ad batch, from idea to result. Tap a row to update it.', addBtn('Add batch VE' + next, () => editor('ads', { batch: 'VE' + next, status: 'Idea', awareness: 'Problem Aware' }))),
+    el('div', { class: 'cards three' }, card('yellow', 'cross', 'Ad ideas', String(ads.length), ads.filter(a => ['Idea', 'Draft'].includes(a.status)).length + ' not made yet'), card('blue', 'star', 'Launched', String(live.length), 'Goal: 5 or more new batches a day'), card('pink', 'heart', 'Winners', String(wins.length), live.length ? pct(wins.length / live.length) + ' of launched ads won' : 'No results yet')),
+    coachSection(),
+    el('h2', {}, 'Ad batch plan'),
+    el('div', { class: 'chips', role: 'group', 'aria-label': 'Show ads' }, statuses.map(s => el('button', { class: 'chip', type: 'button', 'aria-pressed': String(f === s), onclick: () => { S.f.ads = s; render(); } }, s + ' (' + (s === 'All' ? ads.length : ads.filter(a => a.status === s).length) + ')'))),
+    list.length ? el('div', { class: 'tw' }, el('table', {}, el('thead', {}, el('tr', {}, ['Batch', 'Ad idea', 'Launched', 'Spent', 'Click rate', 'Status', 'Result'].map((c, i) => el('th', { class: i >= 3 && i <= 4 ? 'n' : '' }, c)))),
+      el('tbody', {}, list.map(a => el('tr', { class: S.canWrite ? 'click' : '', tabindex: S.canWrite ? '0' : null, onclick: () => editor('ads', a), onkeydown: (e) => { if (e.key === 'Enter') editor('ads', a); } },
+        el('td', {}, el('b', {}, a.batch)), el('td', { style: 'min-width:200px' }, a.concept, a.learnings ? el('div', { class: 'small muted' }, a.learnings) : null), el('td', {}, nice(a.launch) || '—'),
+        el('td', { class: 'n' }, a.spend != null ? money(a.spend, 2) : '—'), el('td', { class: 'n' }, a.ctr != null ? num(a.ctr, 1) + '%' : '—'), el('td', {}, el('span', { class: 'tag ' + (AD_TAG[a.status] || '') }, a.status || '—')), el('td', {}, a.result ? el('span', { class: 'tag ' + (AD_TAG[a.result] || '') }, a.result) : '')))))) : el('div', { class: 'empty' }, 'No ad batches here.')];
+}
+
+/* ---------- creative: research, scripts, Meta-safe check ---------- */
+const FLAGS = [
+  ['red', /\b(do you have|are you suffering|you have (bv|a yeast|an infection|odor)|your (bv|yeast infection|infection|odor problem|smell))\b/gi, 'Don’t tell the viewer they have a problem. Meta rejects ads that guess personal health facts. Say “I had…” or “a lot of women notice…”.'],
+  ['red', /\b(cures?|cured|treats?|treatment|heals?|eliminates?|get rid of|kills? (bacteria|yeast)|antibiotic|bacterial vaginosis|bv|yeast infection|infections?|std|uti)\b/gi, 'Medical claim. Say “supports a healthy pH” or “helps me feel fresh” instead.'],
+  ['red', /\b(fda[- ]approved|clinically proven|doctor[- ]recommended|ob\/?gyn recommended|medical[- ]grade|guaranteed results|100% effective)\b/gi, 'Claim we can’t prove. Remove it.'],
+  ['red', /\b(before and after|before\/after)\b/gi, 'Before-and-after body claims get flagged. Show the product or feelings instead.'],
+  ['yellow', /\b(instant(ly)?|overnight results|in 24 hours|within 24 hours|in (one|1) day|forever|never again|permanent(ly)?)\b/gi, 'Speed or forever promise. Soften it: “after a few nights I noticed…”.'],
+  ['yellow', /\b(disgusting|gross|nasty|fishy|stinks?|stinky|smell(s|ed)? like fish|dirty)\b/gi, 'Shaming words get ads rejected. Use “I didn’t feel fresh” or “something felt off”.'],
+  ['yellow', /\b(sex|sexual|oral|went down on|go(es)? down on|orgasm|semen|naked|aroused)\b/gi, 'Sexual words get flagged. Hint at closeness instead: “I pulled away from my husband”.'],
+  ['yellow', /\b(doctor|dr\.|gynecologist|obgyn|ob\/gyn|nurse|pharmacist|md)\b/gi, 'Only use a real, licensed expert who agreed to be in the ad, and never a fake one.'],
+];
+function metaCheck(text) {
+  const out = []; const seen = new Set();
+  for (const [level, re, why] of FLAGS) { re.lastIndex = 0; let m; while ((m = re.exec(text))) { const w = m[0].toLowerCase(); if (!seen.has(level + w)) { seen.add(level + w); out.push({ level, word: m[0], why }); } } }
+  return out.sort((a, b) => (a.level === 'red' ? 0 : 1) - (b.level === 'red' ? 0 : 1));
+}
+function scriptHelper(inputs) {
+  const box = el('div', { class: 'box', style: 'display:flex;flex-direction:column;gap:8px' });
+  const allText = () => ['title', 'hook', 'script'].map(k => inputs[k] ? inputs[k][0].value : '').join('\n');
+  const draw = () => {
+    const flags = metaCheck(allText());
+    const red = flags.filter(f => f.level === 'red').length;
+    box.replaceChildren(
+      el('div', { class: 'between' }, el('h3', {}, 'Meta safety check'), el('span', { class: 'tag ' + (red ? 'red' : flags.length ? 'yellow' : 'green') }, red ? red + ' must fix' : flags.length ? flags.length + ' to look at' : 'Looks safe')),
+      flags.length ? el('div', {}, flags.slice(0, 12).map(f => el('div', { class: 'flag' }, el('span', { class: 'tag ' + (f.level === 'red' ? 'red' : 'yellow') }, '“' + f.word + '”'), el('span', {}, f.why)))) : el('p', { class: 'small muted' }, 'No risky words found. Still read it once out loud before sending it to an editor.'),
+      el('div', { class: 'row' },
+        el('button', { class: 'btn light small', type: 'button', onclick: async () => { const t = allText(); try { await navigator.clipboard.writeText(t); toast('Copied for your editor'); } catch (e) { inputs.script[0].select(); toast('Press Ctrl+C to copy'); } } }, 'Copy for editor'),
+        S.sample ? fixBtn : null));
+  };
+  const fixBtn = el('button', { class: 'btn small', type: 'button', onclick: async () => {
+    const script = inputs.script[0]; if (!script.value.trim()) { toast('Write a script first'); return; }
+    fixBtn.disabled = true; fixBtn.textContent = 'Claude is fixing it…';
+    try {
+      const { text } = await S.sample('You edit Facebook and Instagram video ad scripts for Vevolia, a 600 mg boric acid vaginal suppository (supports healthy vaginal pH; vaginal use only). Rewrite the script below so Meta will approve it:\n- Never say or imply the viewer has a health condition (no "you have", "do you have", "your odor").\n- No disease or medical claims: no cure, treat, heal, BV, yeast infection, infection, kills bacteria. Use "supports a healthy pH", "helps me feel fresh".\n- No fake experts, "doctor recommended", "clinically proven", "FDA approved".\n- No before/after, no shaming words (fishy, gross, disgusting), nothing sexual or explicit; hint at closeness instead.\n- No speed or forever promises.\nKeep the same story, voice, length, hook strength and scene notes. Write at a 6th grade reading level. Reply with only the new script.\n\nSCRIPT:\n' + script.value.slice(0, 12000), { cache: false });
+      script.value = text.trim(); draw(); toast('Rewritten. Read it before saving.');
+    } catch (e) { toast(e && e.code === 'not_granted' ? 'Claude help is turned off for this page' : e && e.code === 'rate_limited' ? 'Too many requests. Try again in a bit.' : 'Claude could not rewrite it. Try again.'); }
+    fixBtn.disabled = false; fixBtn.textContent = 'Make it Meta-safe with Claude';
+  } }, 'Make it Meta-safe with Claude');
+  ['title', 'hook', 'script'].forEach(k => inputs[k] && inputs[k][0].addEventListener('input', draw));
+  draw();
+  return box;
+}
+const fmtOf = (a) => { const f = String(a.format || '').toLowerCase(); return f.includes('video') ? 'Video' : f.includes('static') && !f.includes('native') ? 'Static' : f.includes('native') ? 'Native' : f ? 'Static' : 'Native'; };
+const SRC_TAG = { Atria: 'pink', TrendTrack: 'blue', Reddit: 'yellow', Google: 'olive', 'Meta Ad Library': 'blue', TikTok: 'pink', Other: '' };
+const SCRIPT_COLS = [['Writing', 'yellow', ['Writing']], ['Ready for editors', 'pink', ['Ready for editors']], ['Editing', 'blue', ['Editing']], ['Done', 'green', ['Done', 'Launched']]];
+function pageCreative() {
+  const os = S.os || {}, t0 = today(), mon = mondayOf(t0), sun = addDays(mon, 6);
+  const week = S.data.ads.filter(a => a.launch && a.launch >= mon && a.launch <= sun);
+  const goals = { Native: os.goalNative ?? 25, Static: os.goalStatic ?? 5, Video: os.goalVideo ?? 3 };
+  const made = (f) => week.filter(a => fmtOf(a) === f).length;
+  const goalCard = (f, color, shape) => { const n = made(f), g = goals[f] || 0; const c = card(color, shape, f + ' ads this week', n + ' of ' + g, n >= g ? 'Goal reached. Nice!' : (g - n) + ' more to launch by Sunday', el('div', { class: 'bar' }, el('i', { style: `width:${g ? Math.min(100, n / g * 100) : 0}%` }))); return c; };
+  const agent = os.agent || null;
+  const view = S.f.cview;
+  const research = [...S.data.research].sort((a, b) => ((a.status === 'New' ? 0 : a.status === 'Use it' ? 1 : 2) - (b.status === 'New' ? 0 : b.status === 'Use it' ? 1 : 2)) || (b.found || '').localeCompare(a.found || ''));
+  const src = S.f.csrc;
+  const rList = research.filter(r => r.status !== 'Skip' && (src === 'All' || r.source === src));
+  const newCount = S.data.research.filter(r => r.status === 'New').length;
+  const toScript = (r) => editor('scripts', { title: (r.brand ? r.brand + ' — ' : '') + (r.title || 'New script'), type: r.format === 'Video' ? 'UGC creator video' : r.format === 'Static' ? 'Static image' : 'Native story', status: 'Writing', hook: r.hook || '', script: '', notes: 'Idea from ' + (r.source || 'research') + (r.link ? ': ' + r.link : '') + (r.why ? '\nWhy it works: ' + r.why : '') + '\nRemake it in our own words. Never copy their exact script.' });
+  const setR = async (r, status) => { try { await S.db.collection('research').doc(r.id).update({ status, updatedAt: new Date().toISOString() }); toast(status === 'Skip' ? 'Skipped' : 'Saved'); } catch (e) { fail(e); } };
+  const researchView = [
+    el('div', { class: 'chips', role: 'group', 'aria-label': 'Where it came from' }, ['All', 'Atria', 'TrendTrack', 'Reddit', 'Google', 'Other'].map(x => el('button', { class: 'chip', type: 'button', 'aria-pressed': String(src === x), onclick: () => { S.f.csrc = x; render(); } }, x))),
+    rList.length ? el('div', { class: 'list' }, rList.map(r => el('div', { class: 'item', style: 'grid-template-columns:1fr auto;align-items:start' },
+      el('div', {}, el('div', { class: 'row', style: 'margin-bottom:4px' }, el('span', { class: 'tag ' + (SRC_TAG[r.source] || '') }, r.source || 'Other'), r.format ? el('span', { class: 'tag' }, r.format) : null, r.status === 'New' ? el('span', { class: 'tag dark' }, 'New') : r.status === 'Use it' ? el('span', { class: 'tag green' }, 'Use it') : r.status === 'Made' ? el('span', { class: 'tag' }, 'Made') : null, el('span', { class: 's' }, nice(r.found))),
+        el('button', { class: 'open', type: 'button', onclick: () => editor('research', r) }, el('span', { class: 't' }, (r.brand ? r.brand + ': ' : '') + r.title)),
+        r.hook ? el('div', { style: 'margin:4px 0;font-style:italic' }, '“' + r.hook + '”') : null,
+        r.why ? el('div', { class: 's' }, 'Why it works: ' + r.why) : null,
+        el('div', { class: 'row', style: 'margin-top:8px' }, el('button', { class: 'btn small writeonly', type: 'button', onclick: () => toScript(r) }, 'Write a script from this'), r.link ? el('a', { class: 'link', href: r.link, target: '_blank', rel: 'noopener' }, 'Open link') : null, r.status !== 'Skip' ? el('button', { class: 'link writeonly', type: 'button', onclick: () => setR(r, 'Skip') }, 'Skip') : null)),
+      el('span')))) : el('div', { class: 'empty' }, src === 'All' ? 'No research yet. The night helper adds new finds every morning, or add one yourself.' : 'Nothing from ' + src + ' yet.')];
+  const scriptsView = [el('div', { class: 'board', style: 'grid-template-columns:repeat(4,minmax(0,1fr))' }, SCRIPT_COLS.map(([name, color, sts]) => {
+    const items = S.data.scripts.filter(x => sts.includes(x.status || 'Writing')).sort((a, b) => (a.due || '9').localeCompare(b.due || '9'));
+    return el('section', { class: 'col' }, el('h2', {}, el('span', {}, name), el('span', { class: 'tag ' + color }, String(items.length))),
+      items.length ? items.map(x => { const fl = metaCheck([x.title, x.hook, x.script].join('\n')); const red = fl.filter(f => f.level === 'red').length;
+        return el('button', { class: 'item', type: 'button', style: 'grid-template-columns:1fr;text-align:left;cursor:pointer;border:0;font:inherit;width:100%', onclick: () => editor('scripts', x) },
+          el('span', { class: 't' }, x.title), el('span', { class: 'row' }, el('span', { class: 'tag' }, x.type || 'Script'), el('span', { class: 'tag ' + (red ? 'red' : fl.length ? 'yellow' : 'green') }, red ? red + ' must fix' : fl.length ? 'Check ' + fl.length : 'Meta-safe')),
+          el('span', { class: 's' }, [x.editor ? 'Editor: ' + x.editor : 'No editor yet', x.due ? 'due ' + nice(x.due) : ''].filter(Boolean).join(' · '))); }) : el('div', { class: 'small muted', style: 'padding:8px' }, 'Nothing here.'));
+  }))];
+  return [
+    head('Creative', 'Find winning ideas, write safe scripts, and keep new ads launching every week.', addBtn('Research find', () => editor('research', { source: 'Atria', format: 'Native', status: 'New', found: t0 })), addBtn('Script', () => editor('scripts', { type: 'UGC creator video', status: 'Writing' }))),
+    el('div', { class: 'cards three' }, goalCard('Native', 'pink', 'heart'), goalCard('Static', 'yellow', 'cross'), goalCard('Video', 'blue', 'star')),
+    el('div', { class: 'between' }, el('p', { class: 'small muted' }, 'Counts come from launch dates on the Ads page (this week, Mon–Sun).'), el('button', { class: 'link writeonly', type: 'button', onclick: () => editor('goals', { goalNative: goals.Native, goalStatic: goals.Static, goalVideo: goals.Video }) }, 'Change weekly goals')),
+    el('div', { class: 'callout ' + (agent ? 'blue' : '') }, el('b', {}, 'Night helper: '), agent ? [agent.lastRun ? 'Last ran ' + new Date(agent.lastRun).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit' }) + '. ' : '', agent.summary || ''] : 'Runs every night while you sleep. It adds new research finds, writes draft scripts, checks your ads, and leaves a short report here.'),
+    el('div', { class: 'chips', role: 'group', 'aria-label': 'Show' }, [['Research', 'Research' + (newCount ? ' (' + newCount + ' new)' : '')], ['Scripts', 'Scripts for editors (' + S.data.scripts.length + ')']].map(([k, l]) => el('button', { class: 'chip', type: 'button', 'aria-pressed': String(view === k), onclick: () => { S.f.cview = k; render(); } }, l))),
+    ...(view === 'Research' ? researchView : scriptsView),
+    acc('script-rules', 'Rules for scripts Meta won’t flag (tap to read)', el('div', { class: 'body' },
+      '1. Talk about yourself, not the viewer. Say “I noticed…”, never “You have…” or “Do you have…”.\n2. No medical words: cure, treat, heal, infection, BV, yeast infection, kills bacteria. Say “supports a healthy pH” or “helps me feel fresh”.\n3. No fake doctors. An expert video needs a real, licensed person who agreed to it. Never say “doctor recommended”, “clinically proven” or “FDA approved”.\n4. No before-and-after, and no shaming words like fishy, gross or disgusting.\n5. Nothing sexual or explicit. Show closeness: holding hands, a hug, not pulling away.\n6. No speed or forever promises like “in 24 hours” or “never again”.\n7. Remake ideas from other brands in our own words and our own story. Never copy a script or video word for word.\n8. Every video ends with: “Vaginal use only. Not for use during pregnancy.”\n\nThe safety check in each script flags risky words for you. It catches common problems, but always read the script once before sending it.'))];
+}
+
+let planTimer = null;
+function pageMoney() {
+  const t = totals();
+  const F = [['target', 'Goal ($)', 'How much we want to make in total.'], ['months', 'Months', 'How long we give ourselves.'], ['aov', 'Average order ($)', 'What one order brings in.'], ['cogs', 'Product cost per order ($)', 'What we pay the supplier.'], ['ship', 'Shipping per order ($)', 'What we pay to ship it.'], ['feesPct', 'Fees (%)', 'Card and app fees.'], ['cpa', 'Cost to get one buyer ($)', 'Ad money spent per new buyer.'], ['rebillPct', 'Buyers who reorder (%)', 'Share who keep their subscription.'], ['rebillMonths', 'Reorders we count', 'How many reorders we plan on.']];
+  const out = el('div', { class: 'section' });
+  const fill = () => {
+    const p = plan(); const ok = p.keepPerOrder > 0 && p.q.cpa < p.buyerWorth;
+    out.replaceChildren(
+      el('div', { class: 'cards three' },
+        card('pink', 'heart', 'Sales we need each month', money(p.perMonth), 'That is ' + money(p.perDay) + ' a day, or about ' + num(p.ordersDay) + ' orders a day.'),
+        card('blue', 'star', 'Ad budget each month', money(p.adBudget), 'About ' + money(p.adDay) + ' a day to get ' + num(p.newBuyers) + ' new buyers.'),
+        card(p.profit >= 0 ? 'olive' : 'yellow', 'tri', 'Profit each month', money(p.profit), 'Before paying people and tools.')),
+      el('div', { class: 'callout ' + (ok ? 'green' : 'pink') }, ok
+        ? `One buyer is worth about ${money(p.buyerWorth, 2)} to us over time. So we can pay up to that to get a buyer and still win. Right now we plan to pay ${money(p.q.cpa)}.`
+        : `This plan loses money. We plan to pay ${money(p.q.cpa)} to get a buyer, but a buyer is only worth ${money(p.buyerWorth, 2)} to us. Lower ad cost, lower product cost, or sell bigger bundles.`));
+  };
+  fill();
+  const inputs = el('div', { class: 'inputs' });
+  for (const [k, lab, help] of F) {
+    const inp = el('input', { id: 'plan-' + k, type: 'number', step: 'any', inputmode: 'decimal', disabled: !S.canWrite || null });
+    inp.value = (S.plan && S.plan[k] != null) ? S.plan[k] : PLAN_DEFAULTS[k];
+    inp.addEventListener('input', () => { const v = Number(inp.value); if (inp.value === '' || !isFinite(v)) return; S.plan = { ...PLAN_DEFAULTS, ...(S.plan || {}), [k]: v }; fill();
+      clearTimeout(planTimer); planTimer = setTimeout(async () => { try { await S.db.doc('plan/main').set({ ...S.plan, updatedAt: new Date().toISOString() }); toast('Plan saved'); } catch (e) { fail(e); } }, 800); });
+    inputs.append(el('div', { class: 'inp' }, el('label', { for: 'plan-' + k }, lab), inp, el('span', { class: 'help' }, help)));
+  }
+  const rows = [...t.rows].reverse();
+  return [
+    head('Money', 'Our plan to reach $1,000,000, and what we made each week.', el('a', { class: 'btn light', href: NUMBERS_URL, target: '_blank', rel: 'noopener' }, 'Live store numbers ↗')),
+    el('section', { class: 'section' }, el('h2', {}, 'The $1M plan'), out),
+    acc('plan', 'Change the plan numbers', el('div', { style: 'padding:0 14px 14px' }, el('p', { class: 'small muted', style: 'margin:0 0 10px' }, 'Our offer: 1 box $29.99 (+$4.99 shipping), Buy 2 Get 1 $59.99, Buy 3 Get 2 $79.99. Changes save by themselves.'), inputs)),
+    el('section', { class: 'section' }, el('div', { class: 'between' }, el('h2', {}, 'Week by week'), addBtn('Add this week', () => editor('scorecard', { week: mondayOf(today()) }))),
+      el('div', { class: 'cards three' }, card('plain', null, 'Money in (total)', money(t.revenue), num(t.orders) + ' orders'), card('plain', null, 'Ad spend (total)', money(t.spend, 2), t.spend ? 'Every $1 of ads brought in ' + money(t.revenue / t.spend, 2) : ''), card('plain', null, 'Best week', money(t.bestWeek), '')),
+      rows.length ? el('div', { class: 'tw' }, el('table', {}, el('thead', {}, el('tr', {}, ['Week of', 'Money in', 'Orders', 'Ad spend', 'Cost per buyer', 'Notes'].map((c, i) => el('th', { class: i && i < 5 ? 'n' : '' }, c)))),
+        el('tbody', {}, rows.map(r => el('tr', { class: S.canWrite ? 'click' : '', tabindex: S.canWrite ? '0' : null, onclick: () => editor('scorecard', r), onkeydown: (e) => { if (e.key === 'Enter') editor('scorecard', r); } },
+          el('td', {}, el('b', {}, nice(r.week))), el('td', { class: 'n' }, money(r.revenue)), el('td', { class: 'n' }, num(r.orders)), el('td', { class: 'n' }, money(r.spend, 2)), el('td', { class: 'n' }, r.orders ? money(r.spend / r.orders, 2) : '—'), el('td', { class: 'small', style: 'min-width:220px' }, r.notes || '')))))) : el('div', { class: 'empty' }, 'No weeks yet. Every Monday, add last week’s numbers.'))];
+}
+
+const STEPS = ['Check the money math', 'Find a supplier', 'Write the plan (MAD)', 'Set up store and ads account', 'Make the first ads', 'Launch', 'Make more ads from results'];
+function pageTesting() {
+  const tp = testPace(), t0 = today(), os = S.os || {};
+  const order = ['Testing', 'Live', 'Scaling', 'Planned', 'Killed'];
+  const spins = [...S.data.spins].sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status));
+  const rule = (good, text, value) => el('div', { class: 'rule' }, el('span', { class: 'dot ' + (good ? 'ok' : 'bad'), role: 'img', 'aria-label': good ? 'On track' : 'Behind' }), el('span', {}, text), el('b', {}, value));
+  const setStep = async (s, n) => { if (!S.canWrite) return; try { await S.db.collection('spins').doc(s.id).update({ stage: n, updatedAt: new Date().toISOString() }); toast('Step saved'); } catch (e) { fail(e); } };
+  const spinBox = (s) => {
+    const stuck = s.blocker && s.blockedSince && daysBetween(s.blockedSince, t0) >= 1;
+    return el('div', { class: 'box section', style: 'gap:12px' },
+      el('div', { class: 'between' }, el('div', {}, el('h2', {}, s.name), el('div', { class: 'small muted' }, [s.handoff ? 'Handed to us ' + nice(s.handoff) : '', s.live ? 'live ' + nice(s.live) : ''].filter(Boolean).join(' · '))),
+        el('div', { class: 'row' }, el('span', { class: 'tag ' + ({ Testing: 'blue', Live: 'green', Scaling: 'green', Planned: 'yellow', Killed: 'dark' }[s.status] || '') }, s.status || 'Planned'), s.verdict ? el('span', { class: 'tag pink' }, s.verdict) : null, el('button', { class: 'btn small writeonly', type: 'button', onclick: () => editor('spins', s) }, 'Update'))),
+      el('div', {}, el('div', { class: 'small', style: 'margin-bottom:6px' }, 'Step ' + (s.stage || 1) + ' of 7: ' + STEPS[(s.stage || 1) - 1]),
+        el('div', { class: 'steps', role: 'group', 'aria-label': 'Steps' }, STEPS.map((name, i) => el('button', { type: 'button', class: 'step' + ((s.stage || 1) > i + 1 ? ' done' : (s.stage || 1) === i + 1 ? ' now' : ''), 'aria-label': 'Step ' + (i + 1) + ': ' + name, disabled: !S.canWrite || null, onclick: () => setStep(s, i + 1) }, el('i'), el('span', {}, (i + 1) + '. ' + name))))),
+      s.blocker ? el('div', { class: 'callout ' + (stuck ? 'pink' : 'blue') }, el('b', {}, stuck ? 'Stuck for ' + daysBetween(s.blockedSince, t0) + ' day(s). Tell Saamir now: ' : 'Stuck on: '), s.blocker) : null,
+      s.progress ? el('div', { class: 'small' }, el('b', {}, 'Today: '), s.progress) : null);
+  };
+  const philosophy = S.data.sops.find(s => s.id === 's01');
+  return [
+    head('Testing', 'Saamir’s testing rules. Move fast, test a lot, and never stay stuck.', os.philosophyPdf ? el('a', { class: 'btn light', href: os.philosophyPdf, target: '_blank', rel: 'noopener' }, 'Read the PDF') : null, addBtn('Add test', () => editor('spins', { status: 'Planned', stage: 1, handoff: t0 }))),
+    el('div', { class: 'rules' },
+      rule(tp.started >= 4, 'Start 4 tests a month', tp.started + ' of 4'),
+      rule(tp.daysToLive != null && tp.daysToLive <= 5, 'Go live 3–5 days after we get a product', tp.daysToLive == null ? '—' : tp.daysToLive + ' days'),
+      rule(tp.batchesPerDay >= 5, 'Launch 5–10 ad batches a day', num(tp.batchesPerDay, 1) + ' a day'),
+      rule(!tp.stuck.length, 'Never stay stuck more than 1 day', tp.stuck.length ? tp.stuck.length + ' stuck' : 'All clear')),
+    el('section', { class: 'section' }, el('h2', {}, 'Our tests'), spins.length ? spins.map(spinBox) : el('div', { class: 'empty' }, 'No tests yet.')),
+    philosophy ? acc('philosophy', 'Read all of Saamir’s testing rules', el('div', { class: 'body' }, philosophy.body)) : null];
+}
+
+function pageRules() {
+  const groups = {}; S.data.sops.forEach(s => (groups[s.group || 'Other'] ||= []).push(s));
+  const order = ['Operating rhythm', 'Testing', 'Creative', 'Media buying', 'Store', 'Infrastructure', 'Other'];
+  return [
+    head('Rules', 'How Saamir and Avant want us to work. Tap a rule to open it.', addBtn('Add rule', () => editor('sops', { group: 'Testing' }))),
+    ...(S.data.sops.length ? order.filter(g => groups[g]).map(g => el('section', { class: 'section', style: 'gap:8px' }, el('h2', {}, g),
+      groups[g].sort((a, b) => (a.order || 0) - (b.order || 0)).map(s => acc('sop-' + s.id, s.title,
+        el('div', { class: 'body' }, s.body || ''), el('div', { class: 'row', style: 'padding:0 18px 14px' }, s.source ? el('a', { class: 'link', href: s.source, target: '_blank', rel: 'noopener' }, 'Open the source doc') : null, el('button', { class: 'link writeonly', type: 'button', onclick: () => editor('sops', s) }, 'Edit')))))) : [el('div', { class: 'empty' }, 'No rules yet.')])];
+}
+
+function pageDocs() {
+  const q = S.f.docs.toLowerCase();
+  const list = S.data.docs.filter(d => !q || [d.title, d.purpose, d.group, d.owner].join(' ').toLowerCase().includes(q));
+  const groups = {}; list.forEach(d => (groups[d.group || 'Other'] ||= []).push(d));
+  const order = ['Vevolia', 'Store', 'Saamir SOPs', 'Avant OPS', 'Creative', 'Research', 'Other'];
+  const search = el('input', { type: 'search', id: 'doc-q', class: 'search', placeholder: 'Find a doc…', 'aria-label': 'Find a doc', style: 'max-width:420px' }); search.value = S.f.docs;
+  search.addEventListener('input', () => { S.f.docs = search.value; const pos = search.selectionStart; render(); const s2 = $('#doc-q'); if (s2) { s2.focus(); s2.setSelectionRange(pos, pos); } });
+  const intel = [...S.data.intel].sort((a, b) => (a.brand || '').localeCompare(b.brand || ''));
+  return [
+    head('Docs', 'All our files in one place. Tap a name to open it.', addBtn('Add doc', () => editor('docs', { group: 'Vevolia' }))),
+    search,
+    ...(list.length ? order.filter(g => groups[g]).map(g => el('section', { class: 'section', style: 'gap:8px' }, el('h2', {}, g),
+      el('div', { class: 'tw' }, el('table', {}, el('tbody', {}, groups[g].sort((a, b) => (a.title || '').localeCompare(b.title || '')).map(d => el('tr', {},
+        el('td', { style: 'width:40%' }, d.url ? el('a', { href: d.url, target: '_blank', rel: 'noopener', style: 'font-weight:600' }, d.title) : el('b', {}, d.title)),
+        el('td', { class: 'small muted' }, d.purpose || ''),
+        el('td', { style: 'width:1%' }, el('button', { class: 'link writeonly', type: 'button', onclick: () => editor('docs', d) }, 'Edit'))))))))) : [el('div', { class: 'empty' }, q ? 'No docs match that.' : 'No docs yet.')]),
+    el('section', { class: 'section', style: 'gap:8px' }, el('div', { class: 'between' }, el('h2', {}, 'Competitors to watch'), addBtn('Add competitor', () => editor('intel', { checked: today() }))),
+      intel.length ? el('div', { class: 'tw' }, el('table', {}, el('thead', {}, el('tr', {}, ['Brand', 'How big', 'What works for them'].map(c => el('th', {}, c)))),
+        el('tbody', {}, intel.map(c => el('tr', { class: S.canWrite ? 'click' : '', tabindex: S.canWrite ? '0' : null, onclick: () => editor('intel', c), onkeydown: (e) => { if (e.key === 'Enter') editor('intel', c); } }, el('td', {}, el('b', {}, c.brand), el('div', { class: 'small muted' }, c.product)), el('td', { class: 'small', style: 'min-width:200px' }, c.signal), el('td', { class: 'small', style: 'min-width:200px' }, c.working)))))) : el('div', { class: 'empty' }, 'None yet.'))];
+}
+
+const KIND_TAG = { Decision: 'pink', Learning: 'blue', Rule: 'yellow', Fact: '', Idea: 'olive' };
+function pageNotes() {
+  const kinds = ['All', 'Decision', 'Learning', 'Rule', 'Fact', 'Idea'], f = S.f.notes;
+  const list = S.data.memory.filter(x => f === 'All' || x.kind === f).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  return [
+    head('Notes', 'What we decided and what we learned, so nobody forgets.', addBtn('Add note', () => editor('memory', { kind: 'Learning', date: today() }))),
+    el('div', { class: 'chips', role: 'group', 'aria-label': 'Show notes' }, kinds.map(k => el('button', { class: 'chip', type: 'button', 'aria-pressed': String(f === k), onclick: () => { S.f.notes = k; render(); } }, k === 'All' ? 'All' : k + 's'))),
+    list.length ? el('div', { class: 'list' }, list.map(x => el('div', { class: 'item', style: 'align-items:start' }, el('span', { class: 'tag ' + (KIND_TAG[x.kind] || '') }, x.kind),
+      el('div', {}, el('div', { style: 'white-space:pre-wrap' }, x.text), el('div', { class: 's' }, nice(x.date))),
+      el('button', { class: 'link writeonly', type: 'button', onclick: () => editor('memory', x) }, 'Edit')))) : el('div', { class: 'empty' }, 'No notes here yet.')];
+}
+
+/* ---------- shell ---------- */
+const PAGES = { home: pageHome, tasks: pageTasks, ads: pageAds, creative: pageCreative, money: pageMoney, testing: pageTesting, rules: pageRules, docs: pageDocs, notes: pageNotes };
+const COUNT = { tasks: () => openTasks().length, creative: () => S.data.research.filter(r => r.status === 'New').length };
+function go(tab) { S.tab = tab; try { localStorage.setItem('vos-tab2', tab); } catch (e) {} render(); window.scrollTo(0, 0); const cur = $('.tab[aria-current="page"]'); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+function render() {
+  $('#tabs').replaceChildren(...TABS.map(([id, label, ic]) => el('button', { class: 'tab', type: 'button', 'aria-current': S.tab === id ? 'page' : null, onclick: () => go(id) }, el('span', { html: icon(ic), style: 'display:contents' }), el('span', {}, label), COUNT[id] && COUNT[id]() ? el('span', { class: 'n' }, String(COUNT[id]())) : null)));
+  const v = $('#view');
+  if (!S.db) { v.replaceChildren(el('h1', {}, greeting() + ', Kayy'), el('div', { class: 'empty' }, S.loaded ? 'Please sign in to Claude to see your workspace.' : 'Loading your workspace…')); return; }
+  document.querySelectorAll('details[data-key]').forEach(d => { d.open ? OPEN.add(d.dataset.key) : OPEN.delete(d.dataset.key); });
+  const active = document.activeElement && document.activeElement.id;
+  const y = window.scrollY;
+  v.replaceChildren(...[].concat(PAGES[S.tab]()).filter(Boolean));
+  if (S.lastTab !== S.tab) { v.classList.remove('fade'); void v.offsetWidth; v.classList.add('fade'); S.lastTab = S.tab; } else window.scrollTo(0, y);
+  if (active && active.startsWith('plan-')) { const a = document.getElementById(active); if (a) { const d = a.closest('details'); if (d) d.open = true; a.focus(); } }
+}
+render();
+
+(async () => {
+  const c = window.claude;
+  const [db, user, mcp, sample] = c && c.use ? await Promise.all([c.use('db'), c.use('user'), c.use('mcp'), c.use('sample')]) : [null, null, null, null];
+  S.loaded = true; S.db = db; S.mcp = mcp; S.sample = sample;
+  if (!db) { render(); return; }
+  if (user && user.can) { try { if (await user.can('data.write') === false) { S.canWrite = false; $('#app').classList.add('ro'); } } catch (e) {} }
+  for (const coll of Object.keys(S.data)) db.collection(coll).onSnapshot((snap) => { S.data[coll] = snap.docs.map(d => ({ id: d.id, ...d.data() })); later(); }, () => {});
+  db.doc('plan/main').onSnapshot((d) => { if (document.activeElement && String(document.activeElement.id).startsWith('plan-')) return; S.plan = d.exists ? d.data() : null; later(); }, () => {});
+  let watching = false;
+  db.doc('meta/os').onSnapshot((d) => { S.os = d.exists ? d.data() : null; if (!watching) { watching = true; startAdWatch(false); } later(); }, () => {});
+  setTimeout(() => { if (!watching) { watching = true; startAdWatch(false); } }, 3000);
+  render();
+})();
+})();
+</script>
+
+</body>
+</html>

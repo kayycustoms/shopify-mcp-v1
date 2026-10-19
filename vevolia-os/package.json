@@ -1,0 +1,19 @@
+{
+  "name": "vevolia-os",
+  "version": "1.0.0",
+  "description": "Vevolia OS: team dashboard for running Vevolia",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
+    "@netlify/blobs": "^11.1.4"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^6.0.2",
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
+  },
+  "private": true,
+  "type": "module"
+}
