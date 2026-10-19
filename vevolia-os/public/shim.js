@@ -64,6 +64,7 @@
       const { colls } = await api('/api/data' + (have ? '?have=' + encodeURIComponent(have) : ''));
       for (const [c, v] of Object.entries(colls)) { cache[c] = v; notify(c); }
       firstLoad();
+      offerImport();
     } catch (e) { if (e.code === 'signed_out') return; }
     polling = setTimeout(poll, document.hidden ? POLL_MS * 4 : POLL_MS);
   }
@@ -81,6 +82,43 @@
     else entry.docs[id] = op === 'update' ? { ...entry.docs[id], ...clone(data) } : clone(data);
     entry.etag = 'local';     // makes the next poll fetch the real copy
     notify(c); setTimeout(poll, 300);
+  }
+
+  /* ---------- first-time data load ----------
+     A brand-new site starts empty. Show a button to load the vevolia-data.json file
+     (all tasks, ads, notes and the testing PDF copied from the Claude dashboard). */
+  function offerImport() {
+    const total = Object.values(cache).reduce((n, v) => n + Object.keys(v.docs || {}).length, 0);
+    const bar = document.getElementById('vos-import');
+    if (total > 0) { if (bar) bar.remove(); return; }
+    if (bar) return;
+    const box = document.createElement('div');
+    box.id = 'vos-import';
+    box.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:900;background:#141414;color:#fff;border-radius:20px;padding:16px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 32px);box-shadow:0 8px 30px rgba(0,0,0,.25)';
+    box.innerHTML = '<span>Your dashboard is empty. Load your saved data file to fill it.</span><label style="background:#f5b8d8;color:#141414;border-radius:999px;padding:10px 16px;font-weight:600;cursor:pointer">Load my data<input type="file" accept=".json,application/json" style="display:none"></label>';
+    document.body.append(box);
+    const span = box.querySelector('span');
+    box.querySelector('input').addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      try {
+        span.textContent = 'Loading… please wait.';
+        const all = JSON.parse(await file.text());
+        const data = all.data || all;
+        const ops = [];
+        for (const [coll, docs] of Object.entries(data)) for (const [id, d] of Object.entries(docs)) ops.push({ op: 'set', coll, id, data: d });
+        for (let i = 0; i < ops.length; i += 50) {
+          const r = await api('/api/data', { method: 'POST', body: JSON.stringify({ ops: ops.slice(i, i + 50) }) });
+          if (r.results && r.results.some((x) => x.code)) throw { message: 'Some items did not save.' };
+          span.textContent = 'Loading… ' + Math.min(i + 50, ops.length) + ' of ' + ops.length;
+        }
+        if (all.pdfBase64) {
+          const bin = Uint8Array.from(atob(all.pdfBase64), (ch) => ch.charCodeAt(0));
+          const res = await fetch('/api/file/testing.pdf', { method: 'POST', credentials: 'same-origin', body: bin });
+          if (!res.ok) throw { message: 'The PDF did not upload.' };
+        }
+        box.remove(); poll();
+      } catch (x) { span.textContent = (x && x.message) || 'That file did not work. Try again.'; }
+    });
   }
 
   const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
